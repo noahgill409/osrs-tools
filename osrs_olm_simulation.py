@@ -1,7 +1,7 @@
 from imports import *
 from osrs_npc_lookup import olm_def_lookup
 from osrs_classes import *
-from markov import *
+from bedevere.markov import *
 import osrs_markov
 import osrs_gear as gear
 
@@ -181,7 +181,7 @@ def kill_time_simple_method(trials: Union[float, int]):
     print(toc - tic)
 
 
-def kill_time_variable_dwh_bgs(trials: Union[float, int]):
+def kill_time_variable_dwh_bgs(trials: Union[float, int], num_dwh: int, num_bgs: int, num_var: int):
     trials = int(trials)
 
     base_def_lvl, def_bonus_stab, def_bonus_slash, def_bonus_crush = olm_def_lookup(team_scale=5, challenge_mode=False)
@@ -228,7 +228,6 @@ def kill_time_variable_dwh_bgs(trials: Union[float, int]):
     # 4 specs: 2, 1, 1
     # 5 specs: 2, 1, 2
 
-    num_dwh, num_bgs, num_var = (1, 1, 2)
     num_specs = sum([num_dwh, num_bgs, num_var])
 
     tic = time.time()
@@ -280,13 +279,20 @@ def kill_time_variable_dwh_bgs(trials: Union[float, int]):
     info_string = '{:d} DWH, {:d} Fill DWH, {:d} BGS, Avg kill ticks = {:.1f}'
     print(info_string.format(num_dwh, num_var, num_bgs, mean_ticks))
 
-    toc = time.time()
-
-    print(toc - tic)
+    return ticks
 
 
 if __name__ == '__main__':
-    # defence_reduction_calculations()
+    defence_reduction_calculations()
     # kill_time_simple_method(trials=1e4)
-    kill_time_variable_dwh_bgs(trials=1e6)
+
+    trials = int(1e2)
+
+    spec_arrangements = [(2, 4, 1), (3, 3, 1), (4, 2, 1)]
+    arrangement_ticks = []
+
+    for sa in spec_arrangements:
+        num_dwh, num_bgs, num_var = sa
+        ticks = kill_time_variable_dwh_bgs(trials, num_dwh, num_bgs, num_var)
+        arrangement_ticks.append(ticks)
 

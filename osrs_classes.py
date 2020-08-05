@@ -1,4 +1,5 @@
 from imports import *
+from bedevere.discrete_sums import *
 import osrs_combat as cb
 import osrs_gear as gear
 

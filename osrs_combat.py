@@ -1,4 +1,5 @@
 from imports import *
+from bedevere.discrete_sums import *
 
 # Constants and literal references
 attack = "attack"

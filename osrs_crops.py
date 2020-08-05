@@ -1,5 +1,9 @@
 from imports import *
-import markov
+
+import sys
+sys.path.insert(0, r'A:\pypackages\bedevere')
+
+import bedevere.markov
 import osrs_markov
 
 

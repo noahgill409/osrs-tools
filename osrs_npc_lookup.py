@@ -1,5 +1,4 @@
-import math
-
+from imports import *
 
 def olm_def_lookup(team_scale: int, challenge_mode: bool = False):
 

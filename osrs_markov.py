@@ -1,4 +1,6 @@
-from markov import *
+from imports import *
+from bedevere.markov import *
+
 
 
 def dwh_effectiveness_estimate(level_defence: int) -> int:
@@ -132,7 +134,7 @@ def main():
 	Q, R = dwh_transition_matrix_generator(182, np.interp(np.arange(183), (182, 0), (0.64, 0.99)))
 	Q2, R2 = bgs_transition_matrix_generator(182, 73, np.interp(np.arange(183), (182, 0), (0.80, 0.99)))
 
-	print('hewo')
+	print(Q2, R2)
 
 
 if __name__ == '__main__':
