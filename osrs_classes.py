@@ -270,7 +270,6 @@ class NPC(Mob):
         else:
             self.types = types
 
-
     def npc_maximum_defence_roll(self, damage_type: str) -> int:
         """Return the maximum defensive roll of an NPC"""
         modifier = 1
@@ -576,7 +575,7 @@ class Player(Mob):
 
     def chinchompa(self, other: NPC, targets: int = 1, distance: int = None) -> DamageData:
         """Returns a DamageData object representing a chinchompa thrown at many NPCs"""
-        assert type(self.style) == RangedStyle
+        assert isinstance(self.style, RangedStyle)
         maximum_targets = 11
         targets = min([maximum_targets, targets])
 

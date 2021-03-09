@@ -1,0 +1,28 @@
+Resources available
+	f: current defense level -> accuracy of all weapons (bgs/dwh/scy)
+	f: (max hit, accuracy) -> damage distribution
+	f: randomly choose how many DWH hit based on defence current
+		f: convert n DWH hits into a damage distribution
+	f: randomly choose how many BGS hit based on defence current
+		f: convert n BGS hits into a damage distribution
+	
+	
+General roadmap
+	Create markov chains for all necessary transitions in def reduction and damage (handled separately because of DWH for olm and miss reduction because of tekton)
+		DWH damage --(independent of)-- DWH reduction
+		BGS damage -(implications on)-> BGS reduction
+		Scy damage
+		
+		
+		
+	
+	Apply one of a few procedures for initiating special attacks on the opponent
+		Monte Carlo (MC) for DWH dmg/spec separately needs to randomly choose
+			hit or not?
+				no: 0/miss reduction
+				yes: damage/70%
+		MC on BGS damage, apply this via def red Markov Chain to account for overkill
+			hit or not?
+				no: 0/miss reduction
+				yes: damage/damage reduction
+		Scythe until absorbed

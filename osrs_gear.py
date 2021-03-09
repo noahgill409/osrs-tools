@@ -10,9 +10,10 @@ file_dwh_inquisitor = ('dwh (inquisitor)', r'dragon warhammer (inquisitor).txt')
 file_scythe_bandos = ('scythe (bandos)', r'scythe of vitur (bandos).txt')
 file_scythe_inquisitor = ('scythe (inquisitor)', r'scythe of vitur (inquisitor).txt')
 file_dragon_hunter_lance = ('dhl', r'dragon hunter lance (bandos).txt')
+file_dwh_bandos_diary = ('dwh (bandos diary)', r'dragon warhammer (bandos diary).txt')
 
 file_tuples = [file_bgs, file_dwh_bandos, file_dwh_inquisitor, file_scythe_bandos, file_scythe_inquisitor,
-               file_dragon_hunter_lance]
+               file_dragon_hunter_lance, file_dwh_bandos_diary]
 
 
 def load_gear_file(filepath: str) -> List[str]:
@@ -24,8 +25,8 @@ def load_gear_file(filepath: str) -> List[str]:
 
 	return lines
 
-
 presets = {}
+
 
 for key, file in file_tuples:
 	presets[key] = load_gear_file(os.path.join(folder, file))

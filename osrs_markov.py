@@ -101,19 +101,6 @@ def bgs_transition_matrix_generator(level_defence: int, bgs_max: int,
 		if bgs_max >= t - i:
 			R[i, 0] = 1 - sum(Q[i, :])
 
-	# for i in range(t):
-	# 	Q[i, i] = bgs_acc / (bgs_max + 1) + (1 - bgs_acc)
-	#
-	# 	try:
-	# 		Q[i, i+1:i+2+bgs_max] = bgs_acc / (bgs_max + 1) * np.ones(shape=bgs_max)
-	#
-	# 	except IndexError as E:
-	# 		if i < t - 1:
-	# 			Q[i, i+1:] = bgs_acc / (bgs_max + 1) * np.ones(shape=t-i-1)
-	#
-	# 		R[i, 0] = 1 - sum(Q[i, :])
-	# 	# fix that
-
 	return Q, R
 
 

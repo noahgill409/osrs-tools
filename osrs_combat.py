@@ -28,6 +28,15 @@ short = accurate
 medium = rapid
 long = longrange
 distance = "distance"
+aggressive = "aggressive"
+
+reap = "reap"
+chop = "chop"
+jab = "jab"
+block = "block"
+
+lunge = "lunge"
+pound = "pound"
 
 melee_damage_types = [stab, slash, crush]
 
