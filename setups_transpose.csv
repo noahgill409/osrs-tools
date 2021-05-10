@@ -1,0 +1,4 @@
+Name	Weapon	Combat	Spell	Ammo	Head	Cape	Neck	Body	Legs	Shield	Hands	Feet	Ring
+Scythe Bandos	Scythe of vitur	*aggressive* *slash*			Neitiznot faceguard	Infernal cape	Amulet of torture	Bandos chestplate	Bandos tassets		Ferocious gloves	Primordial boots	Berserker (i)
+Scythe Inquisitor	Scythe of vitur	*aggressive* *crush*			Inquisitor's great helm	Infernal cape	Amulet of torture	Inquisitor's hauberk	Inquisitor's plateskirt		Ferocious gloves	Primordial boots	Berserker (i)
+Blaze King dharok	Dharok’s greataxe	*aggressive* *slash*			Dharok’s helm	df = pd.read_csv(SETUPS_FILEPATH, delimiter='\t', dtype=str)	Amulet of torture	Dharok’s platebody	Dharok’s platelegs		Ferocious gloves	Primordial boots	

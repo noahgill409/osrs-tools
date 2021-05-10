@@ -1,6 +1,8 @@
 from imports import *
 from bedevere.markov import *
-
+import bedevere.markov as markov
+import osrs_npc_lookup as npc
+import osrs_classes
 
 
 def dwh_effectiveness_estimate(level_defence: int) -> int:
@@ -115,6 +117,61 @@ def crop_transition_matrix_generator(crop_lives: int, chance_to_preserve_life: f
 	R[-1] = q
 
 	return Q, R
+
+
+def health_markov_chain(attacker: osrs_classes.Player, defender: osrs_classes.NPC):
+	"""
+
+	:param attacker: Player class
+	:param defender: NPC class
+	:param potion_decay_duration: Time in minutes between sipping potions. Defaults to 10 (re-aggro timer)
+	:return:
+	"""
+	# clean vars
+	max_health = defender.hitpoints
+	health_states = np.arange(max_health, -1, -1)
+
+	damage_dist = attacker.attack_npc(other=defender)
+	dmg_ary, prb_ary = damage_dist.damage_distribution_array_pair()
+	max_hit = damage_dist.max_hit
+
+	t = max_health
+	r = 1
+
+	Q = np.zeros(shape=(t, t))
+	R = np.zeros(shape=(t, r))
+
+	# [      transient     ] [ abs ]
+	# [ 60 59 58 ... 3 2 1 ] [  0  ]
+
+
+	for i in range(t):
+		for j in range(i, t):
+
+			damage_dealt = j - i
+
+			try:
+				Q[i, j] = prb_ary[damage_dealt]
+
+			except IndexError:
+				pass
+
+		if max_hit >= t - i:
+			R[i, 0] = 1 - sum(Q[i, :])
+
+	health_mc = markov.AbsorbingMarkovChain(Q, R, health_states)
+	return health_mc
+
+
+
+
+
+
+
+
+
+
+
 
 
 def main():

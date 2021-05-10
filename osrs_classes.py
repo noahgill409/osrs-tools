@@ -80,7 +80,9 @@ class DamageData:
 
         self.chance_to_damage = 1 - self.damage_distribution[0]
         self.mean_damage_per_hit = cb.mean_damage_per_hit(self.damage_distribution)
-        self.mean_damage_per_tick = cb.mean_damage_per_tick(self.damage_distribution, self.attack_speed)
+
+    def mean_damage_per_tick(self):
+        return cb.mean_damage_per_tick(self.damage_distribution, self.attack_speed)
 
     def damage_distribution_array_pair(self) -> Tuple[np.array, np.array]:
         """Returns a pair of numpy arrays representing damage values and their associated probability
@@ -248,8 +250,11 @@ class Mob:
 
     def neutralize_buff(self):
         """Returns all potion bonuses to the baseline, 0"""
-        self.attack_pot_bonus, self.strength_pot_bonus, self.defence_pot_bonus, self.ranged_pot_bonus, \
-            self.magic_pot_bonus = (0, 0, 0, 0, 0)
+        self.attack_pot_bonus = 0
+        self.strength_pot_bonus = 0
+        self.defence_pot_bonus = 0
+        self.ranged_pot_bonus = 0
+        self.magic_pot_bonus = 0
 
 
 class NPC(Mob):
@@ -267,8 +272,11 @@ class NPC(Mob):
         if type(types) == str:
             self.types = [types]
 
-        else:
+        elif type(types) == list:
             self.types = types
+
+        else:
+            self.types = []
 
     def npc_maximum_defence_roll(self, damage_type: str) -> int:
         """Return the maximum defensive roll of an NPC"""
@@ -387,6 +395,19 @@ class Player(Mob):
         bonuses = cb.potion_boost_overload_plus(self.attack, self.strength, self.defence, self.ranged, self.magic)
         self.attack_pot_bonus, self.strength_pot_bonus, self.defence_pot_bonus, self.ranged_pot_bonus, \
             self.magic_pot_bonus = bonuses
+
+    def tick_down(self, n: int = None):
+        """Reduces combat stats by n levels, down to the baseline. Default value is 1."""
+        levels_down = n if n else 1
+
+        def tick_pot(pot_bonus: int) -> int:
+            return max([pot_bonus - levels_down, 0])
+
+        self.attack_pot_bonus = tick_pot(self.attack_pot_bonus)
+        self.strength_pot_bonus = tick_pot(self.strength_pot_bonus)
+        self.defence_pot_bonus = tick_pot(self.defence_pot_bonus)
+        self.ranged_pot_bonus = tick_pot(self.ranged_pot_bonus)
+        self.magic_pot_bonus = tick_pot(self.magic_pot_bonus)
 
     def _reset_prayers(self):
         """Reset all prayer attack_strength_modifiers to base value, 1"""
@@ -623,6 +644,38 @@ class Player(Mob):
         ScytheAttack = DamageData(combined_distribution, self.attack_speed, 1 - (1 - accuracy)**len(distributions))
 
         return ScytheAttack
+
+    def dharok_attack(self, other: NPC) -> DamageData:
+        """Returns a distribution of scythe damage and probability values"""
+        dharok_set = [
+            "dharok's greataxe",
+            "dharok's helm",
+            "dharok's platebody",
+            "dharok's platelegs"
+        ]
+        assert self.wearing(dharok_set)
+
+        self.hitpoints_current = 1
+        max_hit_scale_factor = 1 + ((self.hitpoints - self.hitpoints_current)/100 * (self.hitpoints / 100))
+
+        attack_roll_modifier, damage_modifier = (1, max_hit_scale_factor)
+        damage_type_defence_roll = self.style.damage_type
+
+        attack_roll = self.player_maximum_attack_roll(other, attack_roll_modifier)
+        defence_roll = other.npc_maximum_defence_roll(damage_type_defence_roll)
+        accuracy = cb.accuracy(attack_roll, defence_roll)
+        max_hit = self.player_max_hit(other, damage_modifier)
+        attack_distribution = cb.hit_distribution(max_hit, accuracy)
+        AttackDistribution = DamageData(attack_distribution, self.attack_speed, accuracy)
+
+        return AttackDistribution
+
+    def dharok_one_to_zero(self, other: NPC) -> DamageData:
+        dharok_distribution = self.dharok_attack(other)
+        dharok_distribution.attack_speed = 8
+        return dharok_distribution
+
+
 
     def crossbow_distribution(self, other: NPC, style_bonus_attack: int, style_bonus_strength: int, pot_bonus: int,
                               attack_modifier: cb.modifier_types, strength_modifier: cb.modifier_types,

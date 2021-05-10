@@ -36,9 +36,88 @@ PlayerLance = Player(*Player.maxed_stats, gear_list=gear.presets['dhl'],
                      style=MeleeStyle(cb.lunge, cb.stab, cb.shared), prayers=cb.piety, overload=True,
                      slayer_task=False)
 
-# PlayerDWHDiary = Player(*Player.maxed_stats, gear_list=gear.presets['dwh (bandos diary)'],
-#                         style=MeleeStyle(cb.accurate, cb.crush, cb.attack), prayers=cb.piety, overload=True,
-#                         slayer_task=False)
+PlayerLanceInquisitor = Player(*Player.maxed_stats, gear_list=gear.presets['dhl_inq'],
+                               style=MeleeStyle(cb.pound, cb.crush, cb.shared), prayers=cb.piety, overload=True,
+                               slayer_task=False)
+
+PlayerDharok = Player(*Player.maxed_stats, gear_list=gear.presets['dharok'],
+                      style=MeleeStyle(cb.hack, cb.slash, cb.strength), prayers=cb.piety, overload=True,
+                      slayer_task=False)
+
+PlayerDharokBGS = Player(*Player.maxed_stats, gear_list=gear.presets['dharok_bgs'],
+                         style=MeleeStyle(cb.aggressive, cb.slash, cb.strength), prayers=cb.piety, overload=True,
+                         slayer_task=False)
+
+PlayerDharokDWH = Player(*Player.maxed_stats, gear_list=gear.presets['dharok_dwh'],
+                         style=MeleeStyle(cb.accurate, cb.crush, cb.attack), prayers=cb.piety, overload=True,
+                         slayer_task=False)
+
+
+def blaze_king_melee_hand(trials: Union[float, int]):
+    bins = math.floor(trials**(1/3))
+    kill_times_list = []
+    specials_used_list = []
+    scale = 100
+    MeleeHand = npc.olm_melee_hand(team_scale=scale, challenge_mode=False)
+    MeleeHand.defence_current = 0
+
+    dharok_dmg_ary, dharok_prb_ary = PlayerDharok.dharok_one_to_zero(MeleeHand).damage_distribution_array_pair()
+
+    for trial in range(int(trials)):
+        tick = 0    # refresh olm object, start timer
+        MeleeHand.defence_current = MeleeHand.defence
+        MeleeHand.hitpoints_current = MeleeHand.hitpoints
+
+        dwh_hits_landed = 0
+        dwh_hits_target = 3
+        bgs_damage_dealt = 0
+        bgs_damage_target = 75
+        specials_used = 0
+
+        while dwh_hits_landed < dwh_hits_target:
+            dmg_ary, prb_ary = PlayerDharokDWH.attack_npc(MeleeHand, special_attack=True).damage_distribution_array_pair()
+            damage = random.choices(dmg_ary, prb_ary)[0]
+            tick += PlayerDharokDWH.attack_speed
+            specials_used += 1
+
+            if damage > 0:
+                MeleeHand.modify_defence_percent(0.7)
+                MeleeHand.damage(damage)
+                dwh_hits_landed += 1
+
+        while bgs_damage_dealt < bgs_damage_target:
+            dmg_ary, prb_ary = PlayerDharokBGS.\
+                attack_npc(MeleeHand, special_attack=True).damage_distribution_array_pair()
+            damage = random.choices(dmg_ary, prb_ary)[0]
+            tick += PlayerDharokBGS.attack_speed
+            specials_used += 1
+
+            if damage > 0:
+                MeleeHand.modify_defence_flat(-1 * damage)
+                MeleeHand.damage(damage)
+                bgs_damage_dealt += damage
+
+        while MeleeHand.alive():
+            damage = random.choices(dharok_dmg_ary, dharok_prb_ary)[0]
+            tick += 8   # one to zero
+            MeleeHand.damage(damage)
+
+        kill_times_list.append(tick)
+        specials_used_list.append(specials_used)
+
+    kill_times_ary = np.asarray(kill_times_list)
+    specials_used_ary = np.asarray(specials_used_list)
+
+    mean_kill_time = np.mean(kill_times_ary)
+    mean_specs_used = np.mean(specials_used_ary)
+    print("Mean kill time:\n\t{:5.0f}\tticks\n\t{:5.0f}\tminutes".format(mean_kill_time, mean_kill_time/100))
+    print("Mean specs used to reach 0 defence:\n\t{:5.0f}\tspecs".format(mean_specs_used))
+
+    plt.hist(kill_times_ary, bins=bins)
+    plt.show()
+
+    plt.hist(specials_used_ary, bins=list(range(specials_used_ary.min(), specials_used_ary.max())))
+    plt.show()
 
 
 def defence_reduction_calculations(scale, specs=None):
@@ -520,11 +599,10 @@ def kill_time_mixed_inquisitor(trials: Union[float, int], num_specs: int, team_s
 if __name__ == '__main__':
     # defence_reduction_calculations(scale=7)
 
+    trials_run = 1e6
+    blaze_king_melee_hand(trials_run)
 
-
-    trials_run = int(1e5)
-
-    kill_time_simple_method(trials=trials_run, num_specs=7, team_scale=7, challenge_mode=False)
+    # kill_time_simple_method(trials=trials_run, num_specs=7, team_scale=7, challenge_mode=False)
     # kill_time_variable_dwh_bgs(trials_run, 2, 2, 1)
     # kill_time_mixed_inquisitor(trials=trials_run, num_specs=4, team_scale=5, challenge_mode=False)
 

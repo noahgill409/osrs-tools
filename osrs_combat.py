@@ -38,6 +38,10 @@ block = "block"
 lunge = "lunge"
 pound = "pound"
 
+hack = 'hack'
+
+flick = 'flick'
+
 melee_damage_types = [stab, slash, crush]
 
 pray_bonus_dict = {

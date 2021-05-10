@@ -2,6 +2,9 @@ from imports import *
 import itertools
 import pandas as pd
 import os
+import pathlib
+
+SETUPS_FILEPATH = 'setups_transpose.csv'
 
 folder = r'gear list'
 file_bgs = ('bgs', r'bandos godsword (bandos).txt')
@@ -12,8 +15,39 @@ file_scythe_inquisitor = ('scythe (inquisitor)', r'scythe of vitur (inquisitor).
 file_dragon_hunter_lance = ('dhl', r'dragon hunter lance (bandos).txt')
 file_dwh_bandos_diary = ('dwh (bandos diary)', r'dragon warhammer (bandos diary).txt')
 
-file_tuples = [file_bgs, file_dwh_bandos, file_dwh_inquisitor, file_scythe_bandos, file_scythe_inquisitor,
-               file_dragon_hunter_lance, file_dwh_bandos_diary]
+file_abyssal_whip_scuff = ('abyssal whip scuff', r'abyssal whip scuff.txt')
+file_ghrazi_rapier_scuff = ('ghrazi rapier scuff', r'ghrazi rapier scuff.txt')
+file_staff_of_light_scuff = ('staff of light scuff', r'staff of light scuff.txt')
+
+file_dharok = ('dharok', r'dharok.txt')
+file_dharok_dwh = ('dharok_dwh', r'dharok_dwh.txt')
+file_dharok_bgs = ('dharok_bgs', r'dharok_bgs.txt')
+
+file_dhl_inq = ('dhl_inq', r'dragon hunter lance (inquisitor).txt')
+
+file_tuples = [
+	file_bgs,
+	file_dwh_bandos,
+	file_dwh_inquisitor,
+	file_scythe_bandos,
+	file_scythe_inquisitor,
+	file_dragon_hunter_lance,
+	file_dwh_bandos_diary,
+	file_dharok,
+	file_dharok_dwh,
+	file_dharok_bgs,
+	file_dhl_inq,
+	file_abyssal_whip_scuff,
+	file_ghrazi_rapier_scuff,
+	file_staff_of_light_scuff,
+]
+
+
+def load_setups(setup_name: str):
+	df = pd.read_csv(SETUPS_FILEPATH, delimiter='\t', dtype=str)
+	df.columns = [s.lower() for s in df.columns]
+	df_slice = df.loc[df['Name'] == setup_name]
+	return df_slice
 
 
 def load_gear_file(filepath: str) -> List[str]:
@@ -24,6 +58,7 @@ def load_gear_file(filepath: str) -> List[str]:
 			lines.append(line.strip().lower())
 
 	return lines
+
 
 presets = {}
 
@@ -76,8 +111,8 @@ def gear_lookup(df: pd.DataFrame, gear_list: Union[str, List[str]]) -> Tuple[pd.
 def main(filepath: str):
 	gear_list = load_gear_file(filepath)
 	gear_df, stats = gear_lookup(get_gear_from_csv(), gear_list)
-	print(gear_df)
-	print(stats)
+
+	# load_setups()
 
 
 if __name__ == '__main__':
